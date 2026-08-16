@@ -1,0 +1,12 @@
+{
+  "name": "youtube",
+  "version": "1.0.0",
+  "description": "Buildig youtube colne for practise",
+  "license": "ISC",
+  "author": "Aman chamoli",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
