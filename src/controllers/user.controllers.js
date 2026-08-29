@@ -1,8 +1,8 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiResponse } from "../utils/apiResponse.js";
-import { ApiError } from "../utils/apiError.js"
-import { User } from "../models/user.models.js";
-import { uploadOnClouninary } from "../utils/cloundinary.js"
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js"
+import { User } from "../models/user.model.js";
+import { uploadOnCloudinary } from "../utils/Cloudinary.js"
 
 const registerUser = asyncHandler(async (req, res) => {
     const { fullname, username, email, password } = req.body
@@ -27,8 +27,8 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Avatar is required");
     }
 
-    const avatar = await uploadOnClouninary(avatarLocalPath);
-    const coverImage = await uploadOnClouninary(coverImageLocalPath);
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
     if(!avatar){
         throw new ApiError(400, "Avatar is required");
@@ -43,8 +43,8 @@ const registerUser = asyncHandler(async (req, res) => {
         username: username.toLowerCase(),
     })
 
-    const createdUser = await User.findById(user._id).selest(
-        "-password -refreceToken"
+    const createdUser = await User.findById(user._id).select(
+        "-password -refreshToken"
     )
 
     if(!createdUser) {
