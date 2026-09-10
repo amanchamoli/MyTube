@@ -2,7 +2,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.model.js";
-import { uploadOnCloudinary } from "../utils/Cloudinary.js"
+import { uploadOnCloudinary } from "../utils/Cloudinary.js";
+import jwt from "jsonwebtoken"
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -167,4 +168,54 @@ const logOutUser = asyncHandler(async (req, res) => {
     )
 })
 
-export { registerUser, loginUser, logOutUser }
+const refreshAccessToken = asyncHandler( async (req, res) => {
+
+    const incomingRefreshToken = req.coookies.refreshToken || req.body.refreshToken
+
+    if(!incomingRefreshToken){
+        throw new ApiError(401, "unauthenicated request")
+    }
+
+    try {
+        const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
+    
+        if(!decodedToken){
+            throw new ApiError(401, "invalid refre")
+        }
+    
+        const user = await User.findById(decodedToken._id)
+    
+        if(!user){
+            throw new ApiError(404, "User not found")
+        }
+    
+        if(incomingRefreshToken  !== user?.refreshToken){
+            throw new ApiError(401, "invalid refresh token")
+        }
+    
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+    
+        const {accessToken, newRefreshToken} = await generateAccessAndRefreshTokens(user._id)
+    
+        return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200, 
+                {accessToken, refreshToken: newRefreshToken},
+                "Access token refreshed successfully"
+            )
+        )
+    } catch (error) {
+        throw new ApiError(401, error?.message || "Invalid refresh token")
+    }
+    
+    
+})
+
+export { registerUser, loginUser, logOutUser, refreshAccessToken }
