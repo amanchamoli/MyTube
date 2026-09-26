@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { ApiError } from "./utils/ApiError.js";
 
 const app = express()
 
@@ -34,5 +35,26 @@ app.use("/api/v1/playlist", playlistRouter)
 app.use("/api/v1/subscriptions", subscriptionRouter)
 app.use("/api/v1/videos", videoRouter)
 app.use("/api/v1/dashboard", dashboardRouter)
+
+// Global error handler — must be after all routes
+app.use((err, req, res, next) => {
+    if (err instanceof ApiError) {
+        return res.status(err.statusCode).json({
+            success: false,
+            message: err.message,
+            errors: err.errors,
+            data: null
+        })
+    }
+
+    // Fallback for unexpected errors
+    console.error("Unexpected error:", err)
+    return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+        errors: [],
+        data: null
+    })
+})
 
 export { app }
