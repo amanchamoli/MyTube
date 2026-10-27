@@ -156,10 +156,15 @@ const getVideoById = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid video ID")
     }
 
+    const visibilityMatch = req.user
+        ? { $or: [{ isPublished: true }, { owner: req.user._id }] }
+        : { isPublished: true }
+
     const video = await Video.aggregate([
         {
             $match: {
                 _id: new mongoose.Types.ObjectId(videoId),
+                ...visibilityMatch,
             },
         },
         {
@@ -188,18 +193,14 @@ const getVideoById = asyncHandler(async (req, res) => {
                     {
                         $addFields: {
                             subscribersCount: { $size: "$subscribers" },
-                            isSubscribed: {
-                                $cond: {
-                                    if: {
-                                        $in: [
-                                            req.user._id,
-                                            "$subscribers.subscriber",
-                                        ],
-                                    },
-                                    then: true,
-                                    else: false,
-                                },
-                            },
+                            isSubscribed: req.user
+                                ? {
+                                      $in: [
+                                          req.user._id,
+                                          "$subscribers.subscriber",
+                                      ],
+                                  }
+                                : false,
                         },
                     },
                     {
@@ -218,13 +219,9 @@ const getVideoById = asyncHandler(async (req, res) => {
             $addFields: {
                 likesCount: { $size: "$likes" },
                 owner: { $first: "$owner" },
-                isLiked: {
-                    $cond: {
-                        if: { $in: [req.user._id, "$likes.likedBy"] },
-                        then: true,
-                        else: false,
-                    },
-                },
+                isLiked: req.user
+                    ? { $in: [req.user._id, "$likes.likedBy"] }
+                    : false,
             },
         },
         {
@@ -252,9 +249,11 @@ const getVideoById = asyncHandler(async (req, res) => {
     await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } })
 
     // Add video to user watch history
-    await User.findByIdAndUpdate(req.user._id, {
-        $addToSet: { watchHistory: videoId },
-    })
+    if (req.user) {
+        await User.findByIdAndUpdate(req.user._id, {
+            $addToSet: { watchHistory: videoId },
+        })
+    }
 
     return res
         .status(200)

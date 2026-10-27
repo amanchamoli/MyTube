@@ -7,7 +7,7 @@
 ## 1. Overview & Setup
 
 - **Base URL**: `http://localhost:8000/api/v1` (configured via `PORT` in `.env`, default: `8000`)
-- **CORS**: Configured with credentials support (`credentials: true`). Ensure requests send cookies if using cookie auth.
+- **CORS**: Configured with credentials support (`credentials: true`). Set `CORS_ORIGIN` in the deployment environment to the exact frontend origin (for example, `https://my-tube-57merj0na-amans-projects-2227548f.vercel.app`, without a trailing slash); do not use `*` with credentialed requests.
 - **Content Types**:
   - Standard Requests: `application/json`
   - File Uploads: `multipart/form-data`
@@ -484,7 +484,7 @@ export interface PaginatedResult<T> {
 
 #### 1. Get All Videos (Paginated & Search)
 `GET /videos`
-- **Auth**: Yes
+- **Auth**: No (optional JWT accepted)
 - **Query Params**:
   - `page` (number, default: `1`)
   - `limit` (number, default: `10`)
@@ -562,8 +562,8 @@ export interface PaginatedResult<T> {
 
 #### 3. Get Video by ID
 `GET /videos/:videoId`
-- **Auth**: Yes
-- **Side Effects**: Automatically increments video `views` by 1 and pushes `videoId` to user's `watchHistory`.
+- **Auth**: No (optional; a valid token enables personalized fields and adds the video to the user's watch history)
+- **Side Effects**: Automatically increments video `views` by 1. Unpublished videos are only visible to their owner.
 - **Response `200 OK`**:
 ```json
 {
