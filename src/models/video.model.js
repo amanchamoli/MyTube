@@ -31,13 +31,17 @@ const videoSchema = new Schema(
             type: Boolean,
             default: true
         },
+        publishedAt: {
+            type: Date,
+            default: Date.now
+        },
         owner: {
             type: Schema.Types.ObjectId,
             ref: "User"
         }
     },
     {
-    timestamp: true
+    timestamps: true
     }
 )
 

@@ -124,6 +124,7 @@ export interface Video {
   duration: number; // in seconds
   views: number;
   isPublished: boolean;
+  publishedAt: string;
   owner: {
     _id: string;
     username: string;
@@ -507,6 +508,7 @@ export interface PaginatedResult<T> {
         "duration": 1824.5,
         "views": 482,
         "isPublished": true,
+        "publishedAt": "2026-09-20T12:00:00.000Z",
         "createdAt": "2026-09-20T12:00:00.000Z",
         "owner": {
           "_id": "651f...usr",
@@ -552,6 +554,7 @@ export interface PaginatedResult<T> {
     "duration": 1824.5,
     "views": 0,
     "isPublished": true,
+    "publishedAt": "2026-09-22T12:00:00.000Z",
     "owner": "651f...",
     "createdAt": "2026-09-22T12:00:00.000Z"
   },
@@ -577,6 +580,7 @@ export interface PaginatedResult<T> {
     "duration": 1824.5,
     "views": 483,
     "isPublished": true,
+    "publishedAt": "2026-09-20T12:00:00.000Z",
     "likesCount": 94,
     "isLiked": false,
     "createdAt": "2026-09-20T12:00:00.000Z",
