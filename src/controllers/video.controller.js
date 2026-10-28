@@ -363,7 +363,10 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                { isPublished: updatedVideo.isPublished },
+                {
+                    isPublished: updatedVideo.isPublished,
+                    publishedAt: updatedVideo.publishedAt,
+                },
                 "Publish status toggled successfully"
             )
         )
