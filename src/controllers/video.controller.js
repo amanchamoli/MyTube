@@ -20,15 +20,18 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
     const pipeline = []
 
-    // Match by search query
+    if (query !== undefined && typeof query !== "string") {
+        throw new ApiError(400, "Search query must be a string")
+    }
+
     if (query) {
+        const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
         pipeline.push({
-            $search: {
-                index: "search-videos",
-                text: {
-                    query: query,
-                    path: ["title", "description"],
-                },
+            $match: {
+                $or: [
+                    { title: { $regex: escapedQuery, $options: "i" } },
+                    { description: { $regex: escapedQuery, $options: "i" } },
+                ],
             },
         })
     }

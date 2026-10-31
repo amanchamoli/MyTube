@@ -489,7 +489,7 @@ export interface PaginatedResult<T> {
 - **Query Params**:
   - `page` (number, default: `1`)
   - `limit` (number, default: `10`)
-  - `query` (string, optional text search on title & description)
+  - `query` (string, optional case-insensitive substring search on title & description)
   - `sortBy` (string, default: `createdAt`)
   - `sortType` (`"asc"` | `"desc"`, default: `"desc"`)
   - `userId` (string, optional creator user ID filter)
